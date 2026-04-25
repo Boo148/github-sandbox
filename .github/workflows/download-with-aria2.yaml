@@ -17,8 +17,14 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y aria2 python3 python3-pip python3-requests ffmpeg
+          sudo apt-get install -y aria2 python3 python3-pip python3-requests ffmpeg curl unzip
           pip3 install yt-dlp
+
+      - name: Install bun
+        run: |
+          curl -fsSL https://bun.com/install | bash
+          echo "$HOME/.bun/bin" >> $GITHUB_PATH
+          echo "BUN_INSTALL_DIR=$HOME/.bun" >> $GITHUB_ENV
 
       - name: Download bunkr module
         run: |
@@ -143,7 +149,7 @@ jobs:
 
             elif echo "$URL" | grep -qE "(youtube\.com|youtu\.be|twitch\.tv|reddit\.com|ni长沙|pexels|soundcloud)"; then
               echo "⬇️ Downloading with yt-dlp: $URL"
-              yt-dlp -o "tmp_downloads/%(title)s.%(ext)s" -f best "$URL"
+              yt-dlp --no-js-runtimes --js-runtimes bun -o "tmp_downloads/%(title)s.%(ext)s" -f best "$URL"
 
             else
               echo "⬇️ Downloading with aria2: $URL"
