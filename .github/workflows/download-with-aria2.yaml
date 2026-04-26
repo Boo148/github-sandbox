@@ -103,12 +103,35 @@ jobs:
 
           rm -rf tmp_downloads
 
-      - name: Commit & Push
+      - name: Commit & Push in batches
         run: |
           BRANCH="${GITHUB_REF_NAME}"
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add downloads/
-          git commit -m "Add downloaded files from commit [skip ci]" || echo "Nothing to commit"
-          echo "🚀 Pushing to branch: $BRANCH"
-          git push origin HEAD:$BRANCH
+
+          cd downloads
+          ALL_FILES=$(find . -type f | sort)
+          FILE_COUNT=$(echo "$ALL_FILES" | wc -l)
+          echo "Total files to push: $FILE_COUNT"
+
+          BATCH_SIZE=10
+          BATCH_NUM=0
+          CURRENT_BATCH=1
+          TOTAL_BATCHES=$(((FILE_COUNT + BATCH_SIZE - 1) / BATCH_SIZE))
+
+          > /tmp/batch_files.txt
+
+          for FILE in $ALL_FILES; do
+            BATCH_NUM=$((BATCH_NUM + 1))
+            echo "$FILE" >> /tmp/batch_files.txt
+
+            if [ $((BATCH_NUM % BATCH_SIZE)) -eq 0 ] || [ $BATCH_NUM -eq "$FILE_COUNT" ]; then
+              git add -f $(cat /tmp/batch_files.txt)
+              git commit -m "Add downloaded files (batch $CURRENT_BATCH/$TOTAL_BATCHES) [skip ci]" || echo "Nothing to commit"
+              echo "🚀 Pushing batch $CURRENT_BATCH/$TOTAL_BATCHES..."
+              git push origin HEAD:$BRANCH || true
+
+              CURRENT_BATCH=$((CURRENT_BATCH + 1))
+              > /tmp/batch_files.txt
+            fi
+          done
