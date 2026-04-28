@@ -18,7 +18,7 @@ That's it — no tokens or secrets needed.
 
 ### Supported Platforms
 
-- **YouTube** (fully tested) — also supports YouTube Music
+- **YouTube** (fully tested) — also supports  YouTube Music
 - **Bunkr** (fully tested)
 - Other streaming sites may work with yt-dlp
 - **any publickly available downloadable link**
