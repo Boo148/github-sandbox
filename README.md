@@ -16,7 +16,7 @@ A GitHub Actions workflow that lets you download files into your repository just
 
 That's it  — no tokens or secrets needed.
 
-### Supported Platforms
+### Supported Platforms 
 
 - **YouTube** (fully tested) — also supports  YouTube Music
 - **Bunkr** (fully tested)
